@@ -2,6 +2,13 @@
 
 https://vchandwani.github.io/reactMyob/
 
+This project uses MaterialUI components and is responsive.
+
+Further Add-on's that can added:
+
+1. Introduction of redux as state management
+2. Further test can be included
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

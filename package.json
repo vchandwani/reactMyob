@@ -1,5 +1,6 @@
 {
   "name": "react-app",
+  "homepage": "https://vchandwani.github.io/reactMyob/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

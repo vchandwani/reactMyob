@@ -2,8 +2,8 @@ export interface InvoiceObj {
   customerName: string;
   businessName: string;
   invoiceNumber: string;
-  taxPayable: boolean;
-  items: Array<ItemsObj>;
+  taxIncluded: boolean;
+  items: ItemsObj[];
 }
 export interface ItemsObj {
   name: string;

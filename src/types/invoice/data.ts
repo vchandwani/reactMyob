@@ -1,3 +1,4 @@
+export type Obj = Record<string, string | null | boolean>;
 export interface InvoiceObj {
   customerName: string;
   businessName: string;
@@ -19,3 +20,8 @@ export enum NotificationType {
   INFO = 'info',
   SUCCESS = 'success',
 }
+
+export type Values = Record<
+  string,
+  string | number | boolean | Date | string[] | Obj | undefined
+>;

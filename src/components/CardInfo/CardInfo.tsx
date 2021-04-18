@@ -18,6 +18,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import { InvoiceSchema } from '../../lib/validation/invoice';
 import { InvoiceObj, ItemsObj } from '../../types/invoice/data';
+import CustomTextField from '../CustomTextField/CustomTextField';
 
 const useStyles = makeStyles((theme) => ({
   marginTop: {
@@ -222,32 +223,19 @@ const CardInfo: React.FC = () => {
                             sm={6}
                             className={styles.fieldMargin}
                           >
-                            <Field name="customerName" type="text">
+                            <Field
+                              name="customerName"
+                              type="text"
+                              data-testid="customerNameField"
+                            >
                               {({ field, form, meta }: FieldProps) => (
-                                <TextField
-                                  {...field}
-                                  value={meta.value}
-                                  variant="filled"
-                                  data-testid="postFormTitleDiv"
-                                  fullWidth
-                                  autoFocus={true}
+                                <CustomTextField
                                   id="customerName"
-                                  label="Customer Name"
-                                  autoComplete="customerName"
-                                  error={
-                                    meta.touched && meta.error !== undefined
-                                  }
-                                  InputProps={{
-                                    inputProps: {
-                                      'data-testid':
-                                        'postFormCustomerNameField',
-                                    },
-                                  }}
-                                  helperText={
-                                    errors.customerName && touched.customerName
-                                      ? errors.customerName
-                                      : null
-                                  }
+                                  label="Customer Name *"
+                                  field={field}
+                                  meta={meta}
+                                  errors={errors?.customerName}
+                                  touched={touched?.customerName}
                                 />
                               )}
                             </Field>
@@ -258,32 +246,19 @@ const CardInfo: React.FC = () => {
                             sm={6}
                             className={styles.fieldMargin}
                           >
-                            <Field name="businessName" type="text">
+                            <Field
+                              name="businessName"
+                              type="text"
+                              data-testid="businessNameField"
+                            >
                               {({ field, form, meta }: FieldProps) => (
-                                <TextField
-                                  {...field}
-                                  value={meta.value}
-                                  variant="filled"
-                                  data-testid="postFormTitleDiv"
-                                  fullWidth
-                                  autoFocus={true}
+                                <CustomTextField
                                   id="businessName"
-                                  label="Business Name"
-                                  autoComplete="businessName"
-                                  error={
-                                    meta.touched && meta.error !== undefined
-                                  }
-                                  InputProps={{
-                                    inputProps: {
-                                      'data-testid':
-                                        'postFormBusinessNameField',
-                                    },
-                                  }}
-                                  helperText={
-                                    errors.businessName && touched.businessName
-                                      ? errors.businessName
-                                      : null
-                                  }
+                                  label="Business Name *"
+                                  field={field}
+                                  meta={meta}
+                                  errors={errors?.businessName}
+                                  touched={touched?.businessName}
                                 />
                               )}
                             </Field>
@@ -302,33 +277,19 @@ const CardInfo: React.FC = () => {
                             sm={6}
                             className={styles.fieldMargin}
                           >
-                            <Field name="invoiceNumber" type="text">
+                            <Field
+                              name="invoiceNumber"
+                              type="text"
+                              data-testid="invoiceNumberField"
+                            >
                               {({ field, form, meta }: FieldProps) => (
-                                <TextField
-                                  {...field}
-                                  value={meta.value}
-                                  variant="filled"
-                                  data-testid="postFormTitleDiv"
-                                  fullWidth
-                                  autoFocus={true}
+                                <CustomTextField
                                   id="invoiceNumber"
-                                  label="Invoice Number"
-                                  autoComplete="invoiceNumber"
-                                  error={
-                                    meta.touched && meta.error !== undefined
-                                  }
-                                  InputProps={{
-                                    inputProps: {
-                                      'data-testid':
-                                        'postFormInvoiceNumberField',
-                                    },
-                                  }}
-                                  helperText={
-                                    errors.invoiceNumber &&
-                                    touched.invoiceNumber
-                                      ? errors.invoiceNumber
-                                      : null
-                                  }
+                                  label="Invoice Name *"
+                                  field={field}
+                                  meta={meta}
+                                  errors={errors?.invoiceNumber}
+                                  touched={touched?.invoiceNumber}
                                 />
                               )}
                             </Field>
@@ -401,37 +362,24 @@ const CardInfo: React.FC = () => {
                                             <Field
                                               name={`items.${index}.name`}
                                               type="text"
+                                              data-testid={index
+                                                .toString()
+                                                .concat('itemName')}
                                             >
                                               {({
                                                 field,
                                                 form,
                                                 meta,
                                               }: FieldProps) => (
-                                                <TextField
-                                                  {...field}
-                                                  value={meta.value}
-                                                  variant="filled"
-                                                  data-testid={index
-                                                    .toString()
-                                                    .concat('itemName')}
-                                                  fullWidth
-                                                  autoFocus={true}
+                                                <CustomTextField
                                                   id={index
                                                     .toString()
-                                                    .concat('name')}
-                                                  label="Name"
-                                                  autoComplete="name"
-                                                  error={
-                                                    meta.touched &&
-                                                    meta.error !== undefined
-                                                  }
-                                                  InputProps={{
-                                                    inputProps: {
-                                                      'data-testid':
-                                                        'postFormItemNameField',
-                                                    },
-                                                  }}
-                                                  helperText={meta.error}
+                                                    .concat('itemName')}
+                                                  label="Name *"
+                                                  field={field}
+                                                  meta={meta}
+                                                  errors={meta.error}
+                                                  touched={meta.touched}
                                                 />
                                               )}
                                             </Field>
@@ -445,37 +393,24 @@ const CardInfo: React.FC = () => {
                                             <Field
                                               name={`items.${index}.description`}
                                               type="text"
+                                              data-testid={index
+                                                .toString()
+                                                .concat('description')}
                                             >
                                               {({
                                                 field,
                                                 form,
                                                 meta,
                                               }: FieldProps) => (
-                                                <TextField
-                                                  {...field}
-                                                  value={meta.value}
-                                                  variant="filled"
-                                                  data-testid={index
-                                                    .toString()
-                                                    .concat('itemDescription')}
-                                                  fullWidth
-                                                  autoFocus={true}
+                                                <CustomTextField
                                                   id={index
                                                     .toString()
                                                     .concat('description')}
-                                                  label="Description"
-                                                  autoComplete="description"
-                                                  error={
-                                                    meta.touched &&
-                                                    meta.error !== undefined
-                                                  }
-                                                  InputProps={{
-                                                    inputProps: {
-                                                      'data-testid':
-                                                        'postFormItemDescriptionField',
-                                                    },
-                                                  }}
-                                                  helperText={meta.error}
+                                                  label="Description *"
+                                                  field={field}
+                                                  meta={meta}
+                                                  errors={meta.error}
+                                                  touched={meta.touched}
                                                 />
                                               )}
                                             </Field>
@@ -489,36 +424,24 @@ const CardInfo: React.FC = () => {
                                             <Field
                                               name={`items.${index}.unitPrice`}
                                               type="number"
+                                              data-testid={index
+                                                .toString()
+                                                .concat('unitPrice')}
                                             >
                                               {({
                                                 field,
                                                 form,
                                                 meta,
                                               }: FieldProps) => (
-                                                <TextField
-                                                  {...field}
-                                                  value={meta.value}
-                                                  variant="filled"
-                                                  data-testid={index
-                                                    .toString()
-                                                    .concat('unitPrice')}
-                                                  fullWidth
-                                                  autoFocus={true}
+                                                <CustomTextField
                                                   id={index
                                                     .toString()
                                                     .concat('unitPrice')}
-                                                  label="Unit Price"
-                                                  autoComplete="unitPrice"
-                                                  error={
-                                                    meta.touched &&
-                                                    meta.error !== undefined
-                                                  }
-                                                  InputProps={{
-                                                    inputProps: {
-                                                      'data-testid':
-                                                        'postFormItemUnitPriceField',
-                                                    },
-                                                  }}
+                                                  label="Unit Price *"
+                                                  field={field}
+                                                  meta={meta}
+                                                  errors={meta.error}
+                                                  touched={meta.touched}
                                                 />
                                               )}
                                             </Field>
@@ -532,36 +455,24 @@ const CardInfo: React.FC = () => {
                                             <Field
                                               name={`items.${index}.quantity`}
                                               type="number"
+                                              data-testid={index
+                                                .toString()
+                                                .concat('quantity')}
                                             >
                                               {({
                                                 field,
                                                 form,
                                                 meta,
                                               }: FieldProps) => (
-                                                <TextField
-                                                  {...field}
-                                                  value={meta.value}
-                                                  variant="filled"
-                                                  data-testid={index
-                                                    .toString()
-                                                    .concat('quantity')}
-                                                  fullWidth
-                                                  autoFocus={true}
+                                                <CustomTextField
                                                   id={index
                                                     .toString()
                                                     .concat('quantity')}
-                                                  label="Quantity"
-                                                  autoComplete="quantity"
-                                                  error={
-                                                    meta.touched &&
-                                                    meta.error !== undefined
-                                                  }
-                                                  InputProps={{
-                                                    inputProps: {
-                                                      'data-testid':
-                                                        'postFormItemQuantityField',
-                                                    },
-                                                  }}
+                                                  label="Quantity *"
+                                                  field={field}
+                                                  meta={meta}
+                                                  errors={meta.error}
+                                                  touched={meta.touched}
                                                 />
                                               )}
                                             </Field>
@@ -575,42 +486,24 @@ const CardInfo: React.FC = () => {
                                             <Field
                                               name={`items.${index}.price`}
                                               type="text"
+                                              data-testid={index
+                                                .toString()
+                                                .concat('price')}
                                             >
                                               {({
                                                 field,
                                                 form,
                                                 meta,
                                               }: FieldProps) => (
-                                                <TextField
-                                                  {...field}
-                                                  disabled
-                                                  value={
-                                                    values.items[index]
-                                                      ?.unitPrice *
-                                                    values.items[index]
-                                                      ?.quantity
-                                                  }
-                                                  variant="filled"
-                                                  data-testid={index
-                                                    .toString()
-                                                    .concat('price')}
-                                                  fullWidth
-                                                  autoFocus={true}
+                                                <CustomTextField
                                                   id={index
                                                     .toString()
                                                     .concat('price')}
-                                                  label="Price"
-                                                  autoComplete="price"
-                                                  error={
-                                                    meta.touched &&
-                                                    meta.error !== undefined
-                                                  }
-                                                  InputProps={{
-                                                    inputProps: {
-                                                      'data-testid':
-                                                        'postFormItemPriceField',
-                                                    },
-                                                  }}
+                                                  label="Price *"
+                                                  field={field}
+                                                  meta={meta}
+                                                  errors={meta.error}
+                                                  touched={meta.touched}
                                                 />
                                               )}
                                             </Field>

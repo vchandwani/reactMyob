@@ -21,8 +21,13 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title }) => {
   const styles = useStyles();
   return (
-    <Grid data-testid="notificationDiv" className={styles.root} container direction="row">
-      <Grid xs={12} data-testid="notificaitonCol">
+    <Grid
+      data-testid="notificationDiv"
+      className={styles.root}
+      container
+      direction="row"
+    >
+      <Grid xs={12} item data-testid="notificaitonCol">
         <Typography component="h4" variant="h4" className={styles.headerFont}>
           {title}
         </Typography>

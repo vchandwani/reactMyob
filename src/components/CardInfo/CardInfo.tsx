@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Paper,
@@ -9,14 +9,15 @@ import {
   FormControlLabel,
   Radio,
   FormLabel,
+  FormControl,
+  Typography,
 } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
-import { Formik, Form, Field, FieldProps } from 'formik';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import ErrorIcon from '@material-ui/icons/Error';
-import CustomerData from '../CustomerData/CustomerData';
+import { Formik, Form, Field, FieldProps, FieldArray } from 'formik';
+import CloseIcon from '@material-ui/icons/Close';
+import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import { InvoiceSchema } from '../../lib/validation/invoice';
-import { InvoiceObj } from '../../types/invoice/data';
+import { InvoiceObj, ItemsObj } from '../../types/invoice/data';
 
 const useStyles = makeStyles((theme) => ({
   marginTop: {
@@ -34,255 +35,657 @@ const useStyles = makeStyles((theme) => ({
   paddingCard: {
     padding: theme.spacing(1, 0, 1, 1),
   },
+  fieldMargin: {
+    margin: theme.spacing(1, 0),
+  },
+  paddingItem: {
+    padding: theme.spacing(0, 1, 0, 0),
+  },
+  paddingPriceItem: {
+    padding: theme.spacing(0, 1, 0, 0),
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1, 0),
+    },
+  },
+  amountHeader: {
+    textAlign: 'right',
+    padding: theme.spacing(0, 1, 0, 0),
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1.4rem',
+    },
+  },
+  amountText: {
+    textAlign: 'right',
+    padding: theme.spacing(0, 1, 0, 0),
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1.4rem',
+    },
+  },
 }));
 
 const CardInfo: React.FC = () => {
   const styles = useStyles();
+
+  const [itemsArray, setItemsArray] = useState<Array<ItemsObj>>([
+    {
+      name: '',
+      description: '',
+      unitPrice: 0,
+      quantity: 0,
+      price: 0,
+    },
+  ]);
+
   const initialValues: InvoiceObj = {
     customerName: '',
     invoiceNumber: '',
     businessName: '',
     taxIncluded: false,
-    items: [
-      {
-        name: '',
-        description: '',
-        unitPrice: 0,
-        quantity: 0,
-        price: 0,
-      },
-    ],
+    items: itemsArray,
   };
-  const getUsernameEndAdornment = (error: string | undefined): JSX.Element => {
-    if (error) {
-      return <ErrorIcon className={styles.crossIcon} />;
+
+  const [taxItem, setTaxItem] = useState<boolean>(
+    initialValues ? initialValues.taxIncluded : false
+  );
+  const handleChangeOption = (
+    evt: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (evt.target.value && typeof evt.target.value === 'string') {
+      if (evt.target.value.toLowerCase() === 'true') setTaxItem(true);
+      if (evt.target.value.toLowerCase() === 'false') setTaxItem(false);
     }
-    return <span />;
+  };
+  const itemsArrayNew: ItemsObj = {
+    name: '',
+    description: '',
+    unitPrice: 0,
+    quantity: 0,
+    price: 0,
+  };
+
+  const renderAmountFields = (values: InvoiceObj): JSX.Element => {
+    let totalAmount: number = 0;
+    let netAmount: number = 0;
+    let taxAmount: number = 0;
+    const taxPercentage: number = 10;
+
+    for (let i = 0; i < values.items.length; i++) {
+      netAmount += values.items[i].unitPrice * values.items[i].quantity;
+    }
+    taxAmount = (taxPercentage * netAmount) / 100;
+    if (taxItem) {
+      totalAmount = netAmount;
+    } else {
+      totalAmount = netAmount + taxAmount;
+    }
+    return (
+      <Grid
+        container
+        direction="row"
+        justify="flex-end"
+        alignItems="center"
+        className={styles.marginTop}
+        data-testid="amountDiv"
+      >
+        <Grid item xs={6} sm={9} data-testid="netAmountDiv">
+          <Typography
+            component="h5"
+            variant="h5"
+            className={styles.amountHeader}
+          >
+            Net Amount
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={3} data-testid="netAmountVal">
+          <Typography component="h5" variant="h5" className={styles.amountText}>
+            {netAmount}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={9}>
+          <Typography
+            component="h5"
+            variant="h5"
+            className={styles.amountHeader}
+            data-testid="taxAmountDiv"
+          >
+            Tax Amount
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={3} data-testid="taxAmountVal">
+          <Typography component="h5" variant="h5" className={styles.amountText}>
+            {taxAmount}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={9} data-testid="totalAmountDiv">
+          <Typography
+            component="h5"
+            variant="h5"
+            className={styles.amountHeader}
+          >
+            Total Amount
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={3} data-testid="totalAmountVal">
+          <Typography component="h5" variant="h5" className={styles.amountText}>
+            {totalAmount}
+          </Typography>
+        </Grid>
+      </Grid>
+    );
   };
 
   return (
-    <Grid xs={12} direction="row" container>
+    <Grid xs={12} direction="row" container item>
       <Formik
         initialValues={initialValues}
         enableReinitialize
         validationSchema={InvoiceSchema}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
-          console.log(values);
-          // onSubmit(values);
+          alert(`Invoice generated : ${values.invoiceNumber}`);
         }}
       >
-        {({ errors, handleBlur, handleChange, touched }) => (
-          <Form className={styles.form}>
-            <Grid data-testid="cardDiv" container direction="row">
-              <Grid xs={12} data-testid="cardCol">
-                <Paper elevation={1}>
-                  <Card>
-                    <Grid
-                      container
-                      direction="row"
-                      justify="space-between"
-                      alignItems="center"
-                      xs={12}
-                      className={styles.paddingCard}
-                      spacing={1}
-                    >
-                      <Grid xs={12} sm={6} item alignItems="center">
-                        <Grid item>
-                          <Field name="customerName" type="text">
-                            {({ field, form, meta }: FieldProps) => (
-                              <TextField
-                                {...field}
-                                value={meta.value}
-                                variant="filled"
-                                data-testid="postFormTitleDiv"
-                                fullWidth
-                                autoFocus={true}
-                                id="customerName"
-                                label="Customer Name"
-                                autoComplete="customerName"
-                                error={meta.touched && meta.error !== undefined}
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      {getUsernameEndAdornment(
-                                        errors.customerName
-                                      )}
-                                    </InputAdornment>
-                                  ),
-                                  inputProps: {
-                                    'data-testid': 'postFormCustomerNameField',
-                                  },
-                                }}
-                                helperText={
-                                  errors.customerName && touched.customerName
-                                    ? errors.customerName
-                                    : null
-                                }
-                              />
-                            )}
-                          </Field>
-                        </Grid>
-                        <Grid item>
-                          <Field name="businessName" type="text">
-                            {({ field, form, meta }: FieldProps) => (
-                              <TextField
-                                {...field}
-                                value={meta.value}
-                                variant="filled"
-                                data-testid="postFormTitleDiv"
-                                fullWidth
-                                autoFocus={true}
-                                id="businessName"
-                                label="Business Name"
-                                autoComplete="businessName"
-                                error={meta.touched && meta.error !== undefined}
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      {getUsernameEndAdornment(
-                                        errors.businessName
-                                      )}
-                                    </InputAdornment>
-                                  ),
-                                  inputProps: {
-                                    'data-testid': 'postFormBusinessNameField',
-                                  },
-                                }}
-                                helperText={
-                                  errors.businessName && touched.businessName
-                                    ? errors.businessName
-                                    : null
-                                }
-                              />
-                            )}
-                          </Field>
-                        </Grid>
-                      </Grid>
-                      <Grid xs={12} sm={6} item alignItems="center">
-                        <Grid item>
-                          <Field name="customerName" type="text">
-                            {({ field, form, meta }: FieldProps) => (
-                              <TextField
-                                {...field}
-                                value={meta.value}
-                                variant="filled"
-                                data-testid="postFormTitleDiv"
-                                fullWidth
-                                autoFocus={true}
-                                id="invoiceNumber"
-                                label="Invoice Number"
-                                autoComplete="invoiceNumber"
-                                error={meta.touched && meta.error !== undefined}
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      {getUsernameEndAdornment(
-                                        errors.invoiceNumber
-                                      )}
-                                    </InputAdornment>
-                                  ),
-                                  inputProps: {
-                                    'data-testid': 'postFormInvoiceNumberField',
-                                  },
-                                }}
-                                helperText={
-                                  errors.invoiceNumber && touched.invoiceNumber
-                                    ? errors.invoiceNumber
-                                    : null
-                                }
-                              />
-                            )}
-                          </Field>
-                        </Grid>
-                        <Grid item>
-                          <Field name="taxIncluded" type="text">
-                            <FormLabel component="legend">Tax</FormLabel>
-                            {({ field, form, meta }: FieldProps) => (
-                              <RadioGroup
-                                {...field}
-                                name="taxIncluded"
-                                value={meta.value}
-                                onChange={handleChange}
-                                // helperText={
-                                //   errors.taxIncluded && touched.taxIncluded
-                                //     ? errors.taxIncluded
-                                //     : null
-                                // }
-                              >
-                                <FormControlLabel
-                                  value={true}
-                                  control={<Radio />}
-                                  label="Inclusive"
-                                />
-                                <FormControlLabel
-                                  value={false}
-                                  control={<Radio />}
-                                  label="Exclusive"
-                                />
-                              </RadioGroup>
+        {({ errors, touched, values, dirty, isSubmitting }) => {
+          const addMore = () => {
+            setItemsArray([...values.items, itemsArrayNew]);
+          };
 
-                              // <TextField
-                              //   {...field}
-                              //   value={meta.value}
-                              //   variant="filled"
-                              //   data-testid="postFormTitleDiv"
-                              //   fullWidth
-                              //   autoFocus={true}
-                              //   id="taxIncluded"
-                              //   label="Invoice Number"
-                              //   autoComplete="taxIncluded"
-                              //   error={meta.touched && meta.error !== undefined}
-                              //   InputProps={{
-                              //     endAdornment: (
-                              //       <InputAdornment position="end">
-                              //         {getUsernameEndAdornment(
-                              //           errors.taxIncluded
-                              //         )}
-                              //       </InputAdornment>
-                              //     ),
-                              //     inputProps: {
-                              //       'data-testid': 'postFormTaxIncludedField',
-                              //     },
-                              //   }}
-                              //   helperText={
-                              //     errors.taxIncluded && touched.taxIncluded
-                              //       ? errors.taxIncluded
-                              //       : null
-                              //   }
-                              // />
-                            )}
-                          </Field>
+          const removeItem = (i: number): void => {
+            const newItems: ItemsObj[] = values.items.splice(i, 1);
+            setItemsArray(newItems);
+          };
+
+          return (
+            <Form className={styles.form}>
+              <Grid data-testid="cardDiv" container direction="row">
+                <Grid xs={12} data-testid="cardCol" item>
+                  <Paper elevation={1}>
+                    <Card>
+                      <Grid
+                        container
+                        direction="row"
+                        alignItems="center"
+                        xs={12}
+                        item
+                        className={styles.paddingCard}
+                      >
+                        <Grid
+                          xs={12}
+                          item
+                          container
+                          alignItems="center"
+                          spacing={1}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            className={styles.fieldMargin}
+                          >
+                            <Field name="customerName" type="text">
+                              {({ field, form, meta }: FieldProps) => (
+                                <TextField
+                                  {...field}
+                                  value={meta.value}
+                                  variant="filled"
+                                  data-testid="postFormTitleDiv"
+                                  fullWidth
+                                  autoFocus={true}
+                                  id="customerName"
+                                  label="Customer Name"
+                                  autoComplete="customerName"
+                                  error={
+                                    meta.touched && meta.error !== undefined
+                                  }
+                                  InputProps={{
+                                    inputProps: {
+                                      'data-testid':
+                                        'postFormCustomerNameField',
+                                    },
+                                  }}
+                                  helperText={
+                                    errors.customerName && touched.customerName
+                                      ? errors.customerName
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </Grid>
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            className={styles.fieldMargin}
+                          >
+                            <Field name="businessName" type="text">
+                              {({ field, form, meta }: FieldProps) => (
+                                <TextField
+                                  {...field}
+                                  value={meta.value}
+                                  variant="filled"
+                                  data-testid="postFormTitleDiv"
+                                  fullWidth
+                                  autoFocus={true}
+                                  id="businessName"
+                                  label="Business Name"
+                                  autoComplete="businessName"
+                                  error={
+                                    meta.touched && meta.error !== undefined
+                                  }
+                                  InputProps={{
+                                    inputProps: {
+                                      'data-testid':
+                                        'postFormBusinessNameField',
+                                    },
+                                  }}
+                                  helperText={
+                                    errors.businessName && touched.businessName
+                                      ? errors.businessName
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </Grid>
+                        </Grid>
+                        <Grid
+                          xs={12}
+                          item
+                          container
+                          alignItems="center"
+                          spacing={1}
+                        >
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            className={styles.fieldMargin}
+                          >
+                            <Field name="invoiceNumber" type="text">
+                              {({ field, form, meta }: FieldProps) => (
+                                <TextField
+                                  {...field}
+                                  value={meta.value}
+                                  variant="filled"
+                                  data-testid="postFormTitleDiv"
+                                  fullWidth
+                                  autoFocus={true}
+                                  id="invoiceNumber"
+                                  label="Invoice Number"
+                                  autoComplete="invoiceNumber"
+                                  error={
+                                    meta.touched && meta.error !== undefined
+                                  }
+                                  InputProps={{
+                                    inputProps: {
+                                      'data-testid':
+                                        'postFormInvoiceNumberField',
+                                    },
+                                  }}
+                                  helperText={
+                                    errors.invoiceNumber &&
+                                    touched.invoiceNumber
+                                      ? errors.invoiceNumber
+                                      : null
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </Grid>
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            className={styles.fieldMargin}
+                          >
+                            <FormControl component="fieldset">
+                              <FormLabel component="legend">Tax</FormLabel>
+
+                              <Field component={RadioGroup} name="taxIncluded">
+                                {({ field, form, meta }: FieldProps) => (
+                                  <RadioGroup
+                                    {...field}
+                                    value={taxItem}
+                                    onChange={handleChangeOption}
+                                  >
+                                    <FormControlLabel
+                                      value={true}
+                                      control={<Radio />}
+                                      label="Inclusive"
+                                    />
+                                    <FormControlLabel
+                                      value={false}
+                                      control={<Radio />}
+                                      label="Exclusive"
+                                    />
+                                  </RadioGroup>
+                                )}
+                              </Field>
+                            </FormControl>
+                          </Grid>
                         </Grid>
                       </Grid>
-                    </Grid>
-                  </Card>
-                </Paper>
+                      <Grid
+                        container
+                        direction="row"
+                        alignItems="center"
+                        className={styles.paddingCard}
+                      >
+                        <Grid item xs={12}>
+                          <FieldArray
+                            name="items"
+                            render={() => {
+                              const itemsVal: ItemsObj[] = values.items;
+
+                              return (
+                                <Grid item xs={12} container direction="row">
+                                  {itemsVal &&
+                                    itemsArray.length > 0 &&
+                                    itemsArray.map(
+                                      (itemData: ItemsObj, index: number) => (
+                                        <Grid
+                                          item
+                                          xs={12}
+                                          key={index.toString().concat('item')}
+                                          direction="row"
+                                          container
+                                          className={styles.marginTop}
+                                        >
+                                          <Grid
+                                            item
+                                            xs={6}
+                                            sm={2}
+                                            className={styles.paddingItem}
+                                          >
+                                            <Field
+                                              name={`items.${index}.name`}
+                                              type="text"
+                                            >
+                                              {({
+                                                field,
+                                                form,
+                                                meta,
+                                              }: FieldProps) => (
+                                                <TextField
+                                                  {...field}
+                                                  value={meta.value}
+                                                  variant="filled"
+                                                  data-testid={index
+                                                    .toString()
+                                                    .concat('itemName')}
+                                                  fullWidth
+                                                  autoFocus={true}
+                                                  id={index
+                                                    .toString()
+                                                    .concat('name')}
+                                                  label="Name"
+                                                  autoComplete="name"
+                                                  error={
+                                                    meta.touched &&
+                                                    meta.error !== undefined
+                                                  }
+                                                  InputProps={{
+                                                    inputProps: {
+                                                      'data-testid':
+                                                        'postFormItemNameField',
+                                                    },
+                                                  }}
+                                                  helperText={meta.error}
+                                                />
+                                              )}
+                                            </Field>
+                                          </Grid>
+                                          <Grid
+                                            item
+                                            xs={6}
+                                            sm={2}
+                                            className={styles.paddingItem}
+                                          >
+                                            <Field
+                                              name={`items.${index}.description`}
+                                              type="text"
+                                            >
+                                              {({
+                                                field,
+                                                form,
+                                                meta,
+                                              }: FieldProps) => (
+                                                <TextField
+                                                  {...field}
+                                                  value={meta.value}
+                                                  variant="filled"
+                                                  data-testid={index
+                                                    .toString()
+                                                    .concat('itemDescription')}
+                                                  fullWidth
+                                                  autoFocus={true}
+                                                  id={index
+                                                    .toString()
+                                                    .concat('description')}
+                                                  label="Description"
+                                                  autoComplete="description"
+                                                  error={
+                                                    meta.touched &&
+                                                    meta.error !== undefined
+                                                  }
+                                                  InputProps={{
+                                                    inputProps: {
+                                                      'data-testid':
+                                                        'postFormItemDescriptionField',
+                                                    },
+                                                  }}
+                                                  helperText={meta.error}
+                                                />
+                                              )}
+                                            </Field>
+                                          </Grid>
+                                          <Grid
+                                            item
+                                            xs={6}
+                                            sm={2}
+                                            className={styles.paddingItem}
+                                          >
+                                            <Field
+                                              name={`items.${index}.unitPrice`}
+                                              type="number"
+                                            >
+                                              {({
+                                                field,
+                                                form,
+                                                meta,
+                                              }: FieldProps) => (
+                                                <TextField
+                                                  {...field}
+                                                  value={meta.value}
+                                                  variant="filled"
+                                                  data-testid={index
+                                                    .toString()
+                                                    .concat('unitPrice')}
+                                                  fullWidth
+                                                  autoFocus={true}
+                                                  id={index
+                                                    .toString()
+                                                    .concat('unitPrice')}
+                                                  label="Unit Price"
+                                                  autoComplete="unitPrice"
+                                                  error={
+                                                    meta.touched &&
+                                                    meta.error !== undefined
+                                                  }
+                                                  InputProps={{
+                                                    inputProps: {
+                                                      'data-testid':
+                                                        'postFormItemUnitPriceField',
+                                                    },
+                                                  }}
+                                                />
+                                              )}
+                                            </Field>
+                                          </Grid>
+                                          <Grid
+                                            item
+                                            xs={6}
+                                            sm={2}
+                                            className={styles.paddingItem}
+                                          >
+                                            <Field
+                                              name={`items.${index}.quantity`}
+                                              type="number"
+                                            >
+                                              {({
+                                                field,
+                                                form,
+                                                meta,
+                                              }: FieldProps) => (
+                                                <TextField
+                                                  {...field}
+                                                  value={meta.value}
+                                                  variant="filled"
+                                                  data-testid={index
+                                                    .toString()
+                                                    .concat('quantity')}
+                                                  fullWidth
+                                                  autoFocus={true}
+                                                  id={index
+                                                    .toString()
+                                                    .concat('quantity')}
+                                                  label="Quantity"
+                                                  autoComplete="quantity"
+                                                  error={
+                                                    meta.touched &&
+                                                    meta.error !== undefined
+                                                  }
+                                                  InputProps={{
+                                                    inputProps: {
+                                                      'data-testid':
+                                                        'postFormItemQuantityField',
+                                                    },
+                                                  }}
+                                                />
+                                              )}
+                                            </Field>
+                                          </Grid>
+                                          <Grid
+                                            item
+                                            xs={6}
+                                            sm={2}
+                                            className={styles.paddingPriceItem}
+                                          >
+                                            <Field
+                                              name={`items.${index}.price`}
+                                              type="text"
+                                            >
+                                              {({
+                                                field,
+                                                form,
+                                                meta,
+                                              }: FieldProps) => (
+                                                <TextField
+                                                  {...field}
+                                                  disabled
+                                                  value={
+                                                    values.items[index]
+                                                      ?.unitPrice *
+                                                    values.items[index]
+                                                      ?.quantity
+                                                  }
+                                                  variant="filled"
+                                                  data-testid={index
+                                                    .toString()
+                                                    .concat('price')}
+                                                  fullWidth
+                                                  autoFocus={true}
+                                                  id={index
+                                                    .toString()
+                                                    .concat('price')}
+                                                  label="Price"
+                                                  autoComplete="price"
+                                                  error={
+                                                    meta.touched &&
+                                                    meta.error !== undefined
+                                                  }
+                                                  InputProps={{
+                                                    inputProps: {
+                                                      'data-testid':
+                                                        'postFormItemPriceField',
+                                                    },
+                                                  }}
+                                                />
+                                              )}
+                                            </Field>
+                                          </Grid>
+                                          {values.items.length > 1 && (
+                                            <Grid
+                                              item
+                                              xs={3}
+                                              sm={1}
+                                              justify="center"
+                                              alignItems="center"
+                                              container
+                                            >
+                                              <CloseIcon
+                                                onClick={() =>
+                                                  removeItem(index)
+                                                }
+                                              />
+                                            </Grid>
+                                          )}
+                                        </Grid>
+                                      )
+                                    )}
+                                  <Grid
+                                    container
+                                    direction="row"
+                                    justify="flex-start"
+                                    alignContent="center"
+                                    className={styles.marginTop}
+                                  >
+                                    <Grid item xs={12} sm={3}>
+                                      <Button
+                                        fullWidth
+                                        variant="outlined"
+                                        onClick={() => addMore()}
+                                      >
+                                        Add Item{' '}
+                                        <AddCircleOutlineOutlinedIcon />
+                                      </Button>
+                                    </Grid>
+                                  </Grid>
+                                  {renderAmountFields(values)}
+                                </Grid>
+                              );
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid
-              container
-              direction="row"
-              justify="flex-end"
-              alignItems="center"
-              className={styles.marginTop}
-            >
-              <Grid xs={12} md={3}>
-                Test
-                <Button
-                  data-testid="postFormSubmitButton"
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  // disabled={}
-                >
-                  Generate Invoice
-                </Button>
+              <Grid
+                container
+                direction="row"
+                justify="flex-end"
+                alignItems="center"
+                className={styles.marginTop}
+              >
+                <Grid xs={12} md={3} item>
+                  <Button
+                    data-testid="postFormSubmitButton"
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    disabled={isSubmitting || !dirty}
+                  >
+                    Generate Invoice
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
-          </Form>
-        )}
+            </Form>
+          );
+        }}
       </Formik>
     </Grid>
   );

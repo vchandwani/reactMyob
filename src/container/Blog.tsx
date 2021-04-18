@@ -4,13 +4,14 @@ import Header from '../components/Header/Header';
 import CardInfo from '../components/CardInfo/CardInfo';
 
 const Blog: React.FC = (): JSX.Element => (
-  <Container data-testid="portalContainer" maxWidth="md">
+  <Container data-testid="portalContainer" maxWidth="lg">
     <Grid
       container
       direction="row"
       justify="center"
       alignItems="center"
       xs={12}
+      item
     >
       <Header title="Invoice" />
       <CardInfo />

@@ -4,7 +4,6 @@ import {
   Paper,
   Grid,
   Button,
-  TextField,
   RadioGroup,
   FormControlLabel,
   Radio,
@@ -183,6 +182,7 @@ const CardInfo: React.FC = () => {
         validationSchema={InvoiceSchema}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
+          console.log(values);
           alert(`Invoice generated : ${values.invoiceNumber}`);
         }}
       >

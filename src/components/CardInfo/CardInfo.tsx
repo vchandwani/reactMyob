@@ -175,7 +175,7 @@ const CardInfo: React.FC = () => {
   };
 
   return (
-    <Grid xs={12} direction="row" container item>
+    <Grid xs={12} direction="row" container item data-testid="cardInfoDiv">
       <Formik
         initialValues={initialValues}
         enableReinitialize
@@ -222,12 +222,9 @@ const CardInfo: React.FC = () => {
                             xs={12}
                             sm={6}
                             className={styles.fieldMargin}
+                            data-testid="customerNameDiv"
                           >
-                            <Field
-                              name="customerName"
-                              type="text"
-                              data-testid="customerNameField"
-                            >
+                            <Field name="customerName" type="text">
                               {({ field, form, meta }: FieldProps) => (
                                 <CustomTextField
                                   id="customerName"
@@ -245,12 +242,9 @@ const CardInfo: React.FC = () => {
                             xs={12}
                             sm={6}
                             className={styles.fieldMargin}
+                            data-testid="businessNameDiv"
                           >
-                            <Field
-                              name="businessName"
-                              type="text"
-                              data-testid="businessNameField"
-                            >
+                            <Field name="businessName" type="text">
                               {({ field, form, meta }: FieldProps) => (
                                 <CustomTextField
                                   id="businessName"
@@ -276,12 +270,9 @@ const CardInfo: React.FC = () => {
                             xs={12}
                             sm={6}
                             className={styles.fieldMargin}
+                            data-testid="invoiceNumberDiv"
                           >
-                            <Field
-                              name="invoiceNumber"
-                              type="text"
-                              data-testid="invoiceNumberField"
-                            >
+                            <Field name="invoiceNumber" type="text">
                               {({ field, form, meta }: FieldProps) => (
                                 <CustomTextField
                                   id="invoiceNumber"
@@ -299,6 +290,7 @@ const CardInfo: React.FC = () => {
                             xs={12}
                             sm={6}
                             className={styles.fieldMargin}
+                            data-testid="taxIncludedDiv"
                           >
                             <FormControl component="fieldset">
                               <FormLabel component="legend">Tax</FormLabel>
@@ -309,6 +301,7 @@ const CardInfo: React.FC = () => {
                                     {...field}
                                     value={taxItem}
                                     onChange={handleChangeOption}
+                                    data-testid="taxIncludedField"
                                   >
                                     <FormControlLabel
                                       value={true}
@@ -333,7 +326,7 @@ const CardInfo: React.FC = () => {
                         alignItems="center"
                         className={styles.paddingCard}
                       >
-                        <Grid item xs={12}>
+                        <Grid item xs={12} data-testid="itemsRow">
                           <FieldArray
                             name="items"
                             render={() => {
@@ -504,6 +497,13 @@ const CardInfo: React.FC = () => {
                                                   meta={meta}
                                                   errors={meta.error}
                                                   touched={meta.touched}
+                                                  disabled={true}
+                                                  value={
+                                                    values.items[index]
+                                                      ?.unitPrice *
+                                                    values.items[index]
+                                                      ?.quantity
+                                                  }
                                                 />
                                               )}
                                             </Field>
@@ -518,6 +518,7 @@ const CardInfo: React.FC = () => {
                                               container
                                             >
                                               <CloseIcon
+                                                data-testid="closeButton"
                                                 onClick={() =>
                                                   removeItem(index)
                                                 }
@@ -539,6 +540,7 @@ const CardInfo: React.FC = () => {
                                         fullWidth
                                         variant="outlined"
                                         onClick={() => addMore()}
+                                        data-testid="addButton"
                                       >
                                         Add Item{' '}
                                         <AddCircleOutlineOutlinedIcon />
@@ -570,7 +572,7 @@ const CardInfo: React.FC = () => {
                     variant="contained"
                     color="primary"
                     fullWidth
-                    disabled={isSubmitting || !dirty}
+                    // disabled={isSubmitting || !dirty}
                   >
                     Generate Invoice
                   </Button>

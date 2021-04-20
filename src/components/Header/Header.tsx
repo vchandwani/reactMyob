@@ -22,12 +22,12 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const styles = useStyles();
   return (
     <Grid
-      data-testid="notificationDiv"
+      data-testid="headerDiv"
       className={styles.root}
       container
       direction="row"
     >
-      <Grid xs={12} item data-testid="notificaitonCol">
+      <Grid xs={12} item>
         <Typography component="h4" variant="h4" className={styles.headerFont}>
           {title}
         </Typography>

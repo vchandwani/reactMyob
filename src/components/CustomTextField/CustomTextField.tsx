@@ -10,6 +10,8 @@ interface TextFieldProps {
   meta: FieldMetaProps<Values>;
   errors?: string;
   touched?: boolean | undefined;
+  value?: string | number;
+  disabled?: boolean;
 }
 
 const CustomTextField: React.FC<TextFieldProps> = ({
@@ -19,12 +21,13 @@ const CustomTextField: React.FC<TextFieldProps> = ({
   meta,
   errors,
   touched,
+  value,
+  disabled,
 }) => (
   <TextField
     {...field}
-    value={meta.value}
+    value={value || meta.value}
     variant="filled"
-    data-testid="postFormTitleDiv"
     fullWidth
     autoFocus={true}
     id={id}
@@ -32,6 +35,12 @@ const CustomTextField: React.FC<TextFieldProps> = ({
     autoComplete={id}
     error={meta.touched && meta.error !== undefined}
     helperText={errors && touched ? errors : null}
+    disabled={disabled}
+    InputProps={{
+      inputProps: {
+        'data-testid': id.concat('Field'),
+      },
+    }}
   />
 );
 

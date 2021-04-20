@@ -7,7 +7,7 @@ import ThemeWrapper from './utils/ThemeWrapper';
 function App() {
   return (
     <ThemeWrapper>
-      <Container title="mainDiv">
+      <Container title="mainDiv" data-testid="mainDiv">
         <Blog />
       </Container>
     </ThemeWrapper>

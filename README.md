@@ -7,7 +7,8 @@ This project uses MaterialUI components and is responsive.
 Further Add-on's that can added:
 
 1. Introduction of redux as state management
-2. Further test can be included
+2. Further more detailed tests can be included
+3. Currently project has a defect, on click of Add Item some form data getting reset.
 
 # Getting Started with Create React App
 
